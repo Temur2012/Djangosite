@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<section class="hero">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-3 fw-bold mb-3">Bilim. Ilhom. <span class="text-gradient">Hikoyalar.</span></h1>
+                <p class="lead text-muted mb-4">Eng so'ngi maqolalar, qiziqarli mavzular va yorqin g'oyalar bir joyda.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{% url 'post_list' %}" class="btn btn-gradient btn-lg"><i class="bi bi-book"></i> Maqolalarni o'qish</a>
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-outline-dark btn-lg">A'zo bolish</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-shape"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if featured_posts %}
+<section class="container my-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <h2 class="section-title"><i class="bi bi-star-fill text-warning"></i> Tanlangan maqolalar</h2>
+    </div>
+    <div class="row g-4">
+        {% for post in featured_posts %}
+        <div class="col-md-4">
+            <article class="card post-card h-100 shadow-sm border-0">
+                {% if post.image %}
+                <a href="{{ post.get_absolute_url }}"><img src="{{ post.image.url }}" class="card-img-top post-img" alt="{{ post.title }}"></a>
+                {% endif %}
+                <div class="card-body">
+                    {% if post.category %}<a href="{{ post.category.get_absolute_url }}" class="badge bg-gradient mb-2">{{ post.category.name }}</a>{% endif %}
+                    <h5 class="card-title"><a href="{{ post.get_absolute_url }}" class="link-dark text-decoration-none">{{ post.title }}</a></h5>
+                    <p class="text-muted small">{{ post.excerpt|default:post.body|truncatewords:18 }}</p>
+                </div>
+                <div class="card-footer bg-white border-0 d-flex justify-content-between small text-muted">
+                    <span><i class="bi bi-person"></i> {{ post.author.username }}</span>
+                    <span><i class="bi bi-clock"></i> {{ post.reading_time }} daq.</span>
+                </div>
+            </article>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="container my-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h2 class="section-title mb-4"><i class="bi bi-newspaper"></i> Yangi maqolalar</h2>
+            <div class="row g-4">
+                {% for post in latest_posts %}
+                <div class="col-md-6">
+                    <article class="card post-card h-100 shadow-sm border-0">
+                        {% if post.image %}<a href="{{ post.get_absolute_url }}"><img src="{{ post.image.url }}" class="card-img-top post-img" alt=""></a>{% endif %}
+                        <div class="card-body">
+                            {% if post.category %}<span class="badge bg-light text-dark mb-2">{{ post.category.name }}</span>{% endif %}
+                            <h6><a href="{{ post.get_absolute_url }}" class="link-dark text-decoration-none">{{ post.title }}</a></h6>
+                            <p class="small text-muted mb-0">{{ post.published_at|naturaltime }}</p>
+                        </div>
+                    </article>
+                </div>
+                {% empty %}
+                <div class="col-12"><p class="text-muted">Hozircha maqolalar yo'q.</p></div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <aside class="col-lg-4 mt-5 mt-lg-0">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="bi bi-fire text-danger"></i> Mashhur</h6>
+                    <ul class="list-unstyled mb-0">
+                        {% for post in popular_posts %}
+                        <li class="border-bottom py-2"><a href="{{ post.get_absolute_url }}" class="link-dark text-decoration-none">{{ post.title }}</a><br><small class="text-muted"><i class="bi bi-eye"></i> {{ post.views }}</small></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="bi bi-tags"></i> Kategoriyalar</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for cat in categories %}
+                        <a href="{{ cat.get_absolute_url }}" class="badge bg-light text-dark text-decoration-none">{{ cat.name }} ({{ cat.post_count }})</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm bg-gradient-soft">
+                <div class="card-body">
+                    <h6 class="fw-bold">📬 Newsletter</h6>
+                    <p class="small text-muted">Eng yaxshi maqolalarni emailingizga oling.</p>
+                    <form method="post" action="{% url 'newsletter_subscribe' %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="email" name="email" class="form-control" placeholder="Email" required>
+                            <button class="btn btn-gradient" type="submit">OK</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

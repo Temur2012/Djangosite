@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <h1 class="section-title mb-4"><i class="bi bi-tag"></i> #{{ tag.name }}</h1>
+    <div class="row g-4">
+        {% for post in page_obj %}
+        <div class="col-md-6 col-lg-4">
+            <article class="card post-card h-100 border-0 shadow-sm">
+                {% if post.image %}<img src="{{ post.image.url }}" class="card-img-top post-img">{% endif %}
+                <div class="card-body">
+                    <h5><a href="{{ post.get_absolute_url }}" class="link-dark text-decoration-none">{{ post.title }}</a></h5>
+                </div>
+            </article>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

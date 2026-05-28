@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block description %}{{ post.excerpt|default:post.body|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+<article class="container my-5" style="max-width: 820px;">
+    <div class="text-center mb-4">
+        {% if post.category %}<a href="{{ post.category.get_absolute_url }}" class="badge bg-gradient text-decoration-none">{{ post.category.name }}</a>{% endif %}
+        <h1 class="display-5 fw-bold mt-3">{{ post.title }}</h1>
+        <div class="text-muted small">
+            <i class="bi bi-person-circle"></i> {{ post.author.username }} ·
+            <i class="bi bi-calendar"></i> {{ post.published_at|date:"d M Y" }} ·
+            <i class="bi bi-clock"></i> {{ post.reading_time }} daq. ·
+            <i class="bi bi-eye"></i> {{ post.views }}
+        </div>
+    </div>
+
+    {% if post.image %}<img src="{{ post.image.url }}" class="img-fluid rounded-4 shadow mb-4" alt="">{% endif %}
+
+    {% if post.excerpt %}<p class="lead text-muted">{{ post.excerpt }}</p>{% endif %}
+
+    <div class="post-body">{{ post.body|linebreaks }}</div>
+
+    {% if post.tags.all %}
+    <div class="my-4">
+        {% for t in post.tags.all %}
+        <a href="{% url 'tag_detail' t.slug %}" class="badge bg-light text-dark text-decoration-none me-1">#{{ t.name }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center border-top border-bottom py-3 my-4">
+        {% if user.is_authenticated %}
+        <button id="likeBtn" class="btn btn-outline-danger" data-url="{% url 'like_post' post.slug %}">
+            <i class="bi bi-heart{% if user in post.likes.all %}-fill{% endif %}"></i>
+            <span id="likeCount">{{ post.total_likes }}</span>
+        </button>
+        {% else %}
+        <span class="text-muted"><i class="bi bi-heart"></i> {{ post.total_likes }}</span>
+        {% endif %}
+
+        {% if user == post.author or user.is_staff %}
+        <div>
+            <a href="{% url 'post_edit' post.slug %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Tahrirlash</a>
+            <a href="{% url 'post_delete' post.slug %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Ochirish</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <section class="my-5">
+        <h4 class="mb-3"><i class="bi bi-chat-dots"></i> Izohlar ({{ comments|length }})</h4>
+
+        {% if user.is_authenticated %}
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            {{ comment_form.body }}
+            <button class="btn btn-gradient mt-2"><i class="bi bi-send"></i> Yuborish</button>
+        </form>
+        {% else %}
+        <div class="alert alert-info">Izoh qoldirish uchun <a href="{% url 'login' %}">kiring</a>.</div>
+        {% endif %}
+
+        {% for c in comments %}
+        <div class="d-flex mb-3">
+            <div class="me-3">
+                {% if c.author.profile.avatar %}
+                <img src="{{ c.author.profile.avatar.url }}" class="avatar-md rounded-circle">
+                {% else %}
+                <div class="avatar-md rounded-circle bg-gradient text-white d-flex align-items-center justify-content-center">{{ c.author.username|first|upper }}</div>
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                <div class="bg-light rounded-3 p-3">
+                    <strong>{{ c.author.username }}</strong> <small class="text-muted">· {{ c.created_at|naturaltime }}</small>
+                    <p class="mb-0">{{ c.body|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">Hali izohlar yo'q. Birinchi bo'lib yozing!</p>
+        {% endfor %}
+    </section>
+</article>
+
+{% if related_posts %}
+<section class="bg-light py-5 mt-5">
+    <div class="container">
+        <h3 class="section-title mb-4">O'xshash maqolalar</h3>
+        <div class="row g-4">
+            {% for p in related_posts %}
+            <div class="col-md-4">
+                <div class="card post-card h-100 border-0 shadow-sm">
+                    {% if p.image %}<img src="{{ p.image.url }}" class="card-img-top post-img">{% endif %}
+                    <div class="card-body">
+                        <h6><a href="{{ p.get_absolute_url }}" class="link-dark text-decoration-none">{{ p.title }}</a></h6>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const likeBtn = document.getElementById('likeBtn');
+if (likeBtn) {
+    likeBtn.addEventListener('click', async () => {
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const res = await fetch(likeBtn.dataset.url, {method:'POST', headers:{'X-CSRFToken':csrf}});
+        const data = await res.json();
+        document.getElementById('likeCount').textContent = data.count;
+        likeBtn.querySelector('i').className = 'bi bi-heart' + (data.liked ? '-fill' : '');
+    });
+}
+</script>
+{% endblock %}
