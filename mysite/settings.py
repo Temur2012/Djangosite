@@ -119,5 +119,4 @@ ANYMAIL = {
 
 DEFAULT_FROM_EMAIL = "temuradilbekov468@gmail.com"
 
-# Parol tiklash linki qancha vaqt ishlaydi (soatda)
-PASSWORD_RESET_TIMEOUT = 3600  # 1 soat
+PASSWORD_RESET_TIMEOUT = 3600
