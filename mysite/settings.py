@@ -32,6 +32,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'blog',
+    'anymail',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -112,17 +113,11 @@ MESSAGE_TAGS = {
 # ============================================
 import os
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-# ⚠️ MUHIM: Quyidagi 2 ta qatorni o'zgartiring!
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER', 'temuradilbekov468@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS', 'xdtf mqqd jnej outj')
-
-DEFAULT_FROM_EMAIL = f'MySite <{EMAIL_HOST_USER}>'
-SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+ANYMAIL = {
+    "BREVO_API_KEY": os.environ.get("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"),
+}
+DEFAULT_FROM_EMAIL = "temuradilbekov468@gmail.com"  # Brevo'da tasdiqlagan email
 
 # Parol tiklash linki qancha vaqt ishlaydi (soatda)
 PASSWORD_RESET_TIMEOUT = 3600  # 1 soat
