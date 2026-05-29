@@ -113,11 +113,9 @@ MESSAGE_TAGS = {
 # ============================================
 import os
 
-EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 ANYMAIL = {
-    "BREVO_API_KEY": os.environ.get("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"),
+    "BREVO_API_KEY": os.environ.get("BREVO_API_KEY"),
 }
-DEFAULT_FROM_EMAIL = "temuradilbekov468@gmail.com"  # Brevo'da tasdiqlagan email
 
 # Parol tiklash linki qancha vaqt ishlaydi (soatda)
 PASSWORD_RESET_TIMEOUT = 3600  # 1 soat
