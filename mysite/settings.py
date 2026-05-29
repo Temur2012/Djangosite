@@ -109,13 +109,15 @@ MESSAGE_TAGS = {
 }
 
 # ============================================
-# 📧 EMAIL SOZLAMALARI (Gmail orqali yuborish)
+# 📧 EMAIL SOZLAMALARI (Brevo API orqali)
 # ============================================
-import os
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 
 ANYMAIL = {
     "BREVO_API_KEY": os.environ.get("BREVO_API_KEY"),
 }
+
+DEFAULT_FROM_EMAIL = "temuradilbekov468@gmail.com"
 
 # Parol tiklash linki qancha vaqt ishlaydi (soatda)
 PASSWORD_RESET_TIMEOUT = 3600  # 1 soat
